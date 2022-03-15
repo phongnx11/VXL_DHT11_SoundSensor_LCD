@@ -2,10 +2,10 @@
 #include <Wire.h>
 #include <DHT.h>
  
-#include <LiquidCrystal_I2C.h> // Library for LCD
+#include <LiquidCrystal_I2C.h> // Khai bao cac thu vien ESP8266, DHT, LCD
 LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 16, 2);
  
-const int sampleWindow = 50;                              // Sample window width in mS (50 mS = 20Hz)
+const int sampleWindow = 50;                       // Khoang thoi gian lay mau        
 unsigned int sample;
  
 #define SENSOR_PIN A0
@@ -14,10 +14,10 @@ unsigned int sample;
 #define PIN_LOUD D5
 #define DHTPIN D7
 
-DHT dht(DHTPIN, DHT11);
+DHT dht(DHTPIN, DHT11); // Khai bao loai cam bien nhiet do do am chon
  
-String apiKey = "ZG36HY9NCYEGRWHG"; // Enter your Write API key from ThingSpeak
-const char *ssid = "Xuan Hanh";     // replace with your wifi ssid and wpa2 key
+String apiKey = "ZG36HY9NCYEGRWHG"; // Nhap API Key lay Thingspeak
+const char *ssid = "Xuan Hanh";     
 const char *pass = "66668888";
 const char* server = "api.thingspeak.com";
  
@@ -25,7 +25,7 @@ WiFiClient client;
  
 void setup ()  
 {   
-  pinMode (SENSOR_PIN, INPUT); // Set the signal pin as input  
+  pinMode (SENSOR_PIN, INPUT); // Dat chan cam bien am thanh va cam bien DHT11 la chan input 
   pinMode (DHTPIN, INPUT);
   pinMode(PIN_QUIET, OUTPUT);
   pinMode(PIN_MODERATE, OUTPUT);
@@ -40,7 +40,7 @@ void setup ()
 
   lcd.init();
  
-  // Turn on the backlight.
+  // Bat den nen
   lcd.backlight();
  
   Serial.println("Connecting to ");
@@ -72,32 +72,32 @@ void setup ()
    
 void loop ()  
 { 
-   unsigned long startMillis= millis();                   // Start of sample window
+   unsigned long startMillis= millis();                   // Lay thoi gian bat dau do 
    float peakToPeak = 0;                                  // peak-to-peak level
    float h = dht.readHumidity();
    float t = dht.readTemperature();
-   unsigned int signalMax = 0;                            //minimum value
-   unsigned int signalMin = 1024;                         //maximum value
+   unsigned int signalMax = 0;                            //Gia tri lon nhat
+   unsigned int signalMin = 1024;                         //Gia tri nho nhat
  
-                                                          // collect data for 50 mS
+                                                          // Thu thap du lieu trong 50 mS
    while (millis() - startMillis < sampleWindow)
    {
-      sample = analogRead(SENSOR_PIN);                    //get reading from microphone
-      if (sample < 1024)                                  // toss out spurious readings
+      sample = analogRead(SENSOR_PIN);                    //doc tin hien analog tu cam bien am thanh
+      if (sample < 1024)                                  // gia tri cua tin hieu analog chi trong khoang nho hon 1024
       {
          if (sample > signalMax)
          {
-            signalMax = sample;                           // save just the max levels
+            signalMax = sample;                           // Luu muc level cao nhat
          }
          else if (sample < signalMin)
          {
-            signalMin = sample;                           // save just the min levels
+            signalMin = sample;                           // Luu muc level thap nhat
          }
       }
    }
 
    if (isnan(h)||isnan(t)){
-      Serial.println("Failed to read from DHT sensor!");
+      Serial.println("Failed to read from DHT sensor!"); // Neu khong doc duoc mot trong hai thong so thi quay lai
       return;
     }
 
@@ -120,8 +120,8 @@ void loop ()
   lcd.clear();
     
  
-   peakToPeak = signalMax - signalMin;                    // max - min = peak-peak amplitude
-   int db = map(peakToPeak,20,900,49.5,90);             //calibrate for deciBels
+   peakToPeak = signalMax - signalMin;                    // Lay khoang cach giua hai muc cao nhat va thap nhat cua tin hieu
+   int db = map(peakToPeak,20,900,49.5,90);             // quy chuan sang don vi dB
  
   lcd.setCursor(0, 0);
   lcd.print("Loudness: ");
@@ -179,6 +179,6 @@ void loop ()
   }
     client.stop();
  
-   delay(200);      // thingspeak needs minimum 15 sec delay between updates.
+   delay(200);      // thingspeak cần độ trễ tối thiểu 15 giây giữa các lần cập nhật
    lcd.clear();
 }
